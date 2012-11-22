@@ -89,7 +89,7 @@ public class GameWindow {
 		homeEntry.add(gridSizeField); 
 		
 		
-		// Allow user to change grid size to whatver the number they entered in the textfield
+		// Allow user to change grid size to whatever the number they entered in the textfield
 		btnChangeGrid = new JButton("Change Grid");       
 		btnChangeGrid.setSize(20, 20);
 		
@@ -97,7 +97,7 @@ public class GameWindow {
 			 
             public void actionPerformed(ActionEvent e)
             {
-            	// Execute solver AI
+            	// Change grid size
             	setGridSize(Integer.parseInt(gridSizeField.getText())); 
             	refreshView(); 
             }
@@ -203,7 +203,12 @@ public class GameWindow {
 			intArray.add(i); 
 		}
 		// Mix up the list
+		// We need to have this list be solvable
+		// Keep mixing until we have a solvable array
 		Collections.shuffle(intArray); 
+		while(!isSolvable(intArray, n)) {
+			Collections.shuffle(intArray); 
+		}
 		
 		// Counter to control when we dispense a number
 		int numCounter = 0; 
@@ -217,8 +222,6 @@ public class GameWindow {
 				
 				// First button is blank for the square a player can move to
 				if(i == 0 && j == 0){
-					//tempBtn.setText(" "); 
-					//grid[i][j] = tempBtn;
 					grid[i][j] = new JButton(" "); 
 					row.add(-1); 
 					this.gridPanel.add(grid[i][j]); 
@@ -227,8 +230,6 @@ public class GameWindow {
 				
 				
 				// Add that to the grid row list
-				//tempBtn.setText(String.valueOf(intArray.get(numCounter))); 
-				//grid[i][j] = tempBtn;
 				JButton numButton = new JButton(String.valueOf(intArray.get(numCounter))); 
 				
 				// Add an action listener to each button
@@ -252,6 +253,18 @@ public class GameWindow {
 		            	
 		            	// Valid move, refresh the view
 		            	refreshGridView(); 
+		            	
+		            	// Check for a win after each move
+		            	result = checkForWin();
+		            	
+		            	// Game is won
+		            	if(result){
+		            		JDialog winDialog = new JDialog();
+		            		winDialog.setSize(450,100);
+		            		winDialog.setTitle("Winning");
+		            		winDialog.add(new Label("You won!")); 
+		            		winDialog.setVisible(true); 
+		            	}
 		            }
 
 
@@ -276,6 +289,45 @@ public class GameWindow {
 		
 	}
 	
+	/** 
+	 * We need to ensure a puzzle is solvable. To do so
+	 * take the list and count the number of inversions.
+	 * @param intArray
+	 * @param width, the width of the grid 
+	 * @return boolean, true for solvable, false otherwise
+	 * 
+	 * Source : http://www.cs.bham.ac.uk/~mdr/teaching/modules04/java2/TilesSolvability.html
+	 */
+	private boolean isSolvable(ArrayList<Integer> intArray, int width) {
+		int inversions = 0;
+		
+		for(int i = 0; i < intArray.size(); i++){
+			int num = intArray.get(i);
+			
+			// Starting at the position the number is in
+			// count the numbers below it remaining in the list
+			for (int j = i; j < intArray.size(); j++){
+				if(intArray.get(j) < num) inversions++; 
+			}
+
+		}
+		
+		// Grid width is odd
+		if(width % 2 != 0){
+			// Number of inversions must be even to
+			// be solvable 
+			return (inversions % 2 == 0);
+		} else {
+			// Since empty spot is always on even row
+			// then the number of inversions must be odd
+			return (inversions % 2 != 0);
+		}
+		
+		// Even inversions counts are solvable odd are not
+		//return (inversions % 2 == 0);
+		
+	}
+
 	/** 
 	 * User has entered a new grid value, refresh the view
 	 */
@@ -416,6 +468,18 @@ public class GameWindow {
 		            	
 		            	// Valid move, refresh the view
 		            	refreshGridView(); 
+		            	
+		            	// Check for a win after each move
+		            	result = checkForWin();
+		            	
+		            	// Game is won
+		            	if(result){
+		            		JDialog winDialog = new JDialog();
+		            		winDialog.setSize(450,100);
+		            		winDialog.setTitle("Winning");
+		            		winDialog.add(new Label("You won!")); 
+		            		winDialog.setVisible(true); 
+		            	}
 		            }
 
 
@@ -430,6 +494,43 @@ public class GameWindow {
 		// Rebuilt grid so refresh view
 		refreshView(); 
 		
+	}
+	/**
+	 * Check the existing gameList array to see if the numbers 
+	 * are arranged to produce a win
+	 */
+	private boolean checkForWin() {
+		
+		// Loop through making sure each number is only 1 more than the previous
+		// skip the empty space.
+		for(int i = 0; i < gameList.size(); i++) {			
+            int count = 0;
+			for(int j = 0; j < gameList.get(i).size(); j++){				
+				int num = gameList.get(i).get(j);
+				// When the gamelist's num is -1 that is the blank space
+				if(num == -1){
+					continue; 
+				}
+				
+				// If count is 0 first iteration just plug in first number
+				if(count == 0){
+					count = num;
+				} else {
+					// The next number should be larger than count by 1.
+					// If not the game is not won.
+					if(count + 1 != num) {
+						return false; 
+					} else {
+						// The last checked number becomes the new count
+						count = num; 
+					}
+				}
+					
+			}
+		}
+		
+		// Check completed successfully
+		return true;
 	}
 
 }
