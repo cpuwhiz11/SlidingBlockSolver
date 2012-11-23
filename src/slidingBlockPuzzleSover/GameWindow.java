@@ -7,6 +7,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.ArrayList;
 import java.util.Collections;
+
 import javax.swing.ButtonGroup;
 import javax.swing.JButton;
 import javax.swing.JDialog;
@@ -30,13 +31,15 @@ public class GameWindow {
 	public JFrame mainFrame; 
 	public JPanel gridPanel; 
 	
-	/** Holds the game board's distribution of numbers */
-	public ArrayList<ArrayList<Integer>> gameList = new ArrayList<ArrayList<Integer>>();
+	public GameBoard gameBoard = new GameBoard(new ArrayList<ArrayList<Integer>>());
 	
 	/** Buttons we listen to for actions */ 
 	private JButton btnRunAi;
 	private JButton btnChangeGrid;
 	private JTextField gridSizeField;
+	private JRadioButton aiDfs;
+	private JRadioButton aiBfs;
+	private JRadioButton aiAStar;
 	
 	public GameWindow() {
 		// Create main panel and frame
@@ -117,7 +120,7 @@ public class GameWindow {
  
             public void actionPerformed(ActionEvent e)
             {
-            	btnRunAi.setEnabled(false); 
+            	btnRunAi.setEnabled(false);         	
             }
         });   
 		
@@ -130,14 +133,15 @@ public class GameWindow {
             }
         });   
 		
-		//checkAi.addActionListener(this);
-		
 		checkBoxGroup.add(checkHuman);
 		checkBoxGroup.add(checkAi); 
 		
 		// Add the buttons to the button panel
 		homeEntry.add(checkHuman); 
 		homeEntry.add(checkAi); 
+		
+	    // Will always start on Human panel
+		checkHuman.setSelected(true);
 		
 		// Button to run the ai solver
 		btnRunAi = new JButton("Run Solver");       
@@ -148,8 +152,12 @@ public class GameWindow {
             public void actionPerformed(ActionEvent e)
             {
             	// Execute solver AI
-            	throw new Error("HAVE NOT DONE THIS YET"); 
+            	//throw new Error("HAVE NOT DONE THIS YET"); 
+            	
+            	// Get the selected AI type
+            	runAiDispath(getSelectedAi(), gameBoard);
             }
+
         });   
 
 		// Start disabled
@@ -157,8 +165,49 @@ public class GameWindow {
 		
 		homeEntry.add(btnRunAi);
 		
-	    // Will always start on Human panel
-		checkHuman.setSelected(true);
+		// Options to select particular ai
+		ButtonGroup aiCheckBoxGroup = new ButtonGroup();
+		
+		aiDfs = new JRadioButton("DFS");
+		aiBfs = new JRadioButton("BFS");
+		aiAStar = new JRadioButton("A*");
+		
+		aiDfs.addActionListener(new ActionListener() {
+			 
+            public void actionPerformed(ActionEvent e)
+            {
+            	//btnRunAi.setEnabled(false); 
+            }
+        });   
+		
+		aiBfs.addActionListener(new ActionListener() {
+			 
+            public void actionPerformed(ActionEvent e)
+            {
+            	//btnRunAi.setEnabled(false); 
+            }
+        });   
+		
+		aiAStar.addActionListener(new ActionListener() {
+			 
+            public void actionPerformed(ActionEvent e)
+            {
+            	//btnRunAi.setEnabled(false); 
+            }
+        });   
+		
+		// Add radio buttons to group
+		aiCheckBoxGroup.add(aiDfs);
+		aiCheckBoxGroup.add(aiBfs);
+		aiCheckBoxGroup.add(aiAStar);
+		
+		// Add buttons to panel
+		homeEntry.add(aiDfs);
+		homeEntry.add(aiBfs);
+		homeEntry.add(aiAStar);
+		
+		// Always start on DFS
+		aiDfs.setSelected(true); 
 		
 		// Add the panel to the main panel
 		this.mainPanel.add(homeEntry); 
@@ -188,9 +237,10 @@ public class GameWindow {
 		// second time we use this function
 		this.gridPanel.removeAll();
 		
-		// Clear old list if needed
-		this.gameList.clear(); 
+		// Clear old game board data
+		this.gameBoard.resetGameBoard(); 
 		
+		// Set new size grid
 		this.gridPanel.setLayout(new GridLayout(n, n));
 
 		// Array of buttons to form the grid
@@ -238,6 +288,7 @@ public class GameWindow {
 					 
 		            public void actionPerformed(ActionEvent e)
 		            {
+		            	
 		            	// Execute solver AI
 		            	Boolean result = 
 		            			moveNumber(Integer.parseInt(((JButton)e.getSource()).getText())); 
@@ -282,10 +333,11 @@ public class GameWindow {
 				copyRow.add(item);				
 			}
 			
-			this.gameList.add(copyRow); 
+			this.gameBoard.getGameList().add(copyRow); 
 		}
 		
-		System.out.print("New grid is: " + this.gameList.toString()); 
+		System.out.print("New grid is: " + this.gameBoard.getGameList().toString()); 
+    	//List<Integer> posMoves = AiUtils.getNextMove(this.gameList);
 		
 	}
 	
@@ -345,9 +397,9 @@ public class GameWindow {
 		// Get the number grid and look and see if this is a valid move
 		// find the number the player is trying to move
 		int posR = -1, posC = -1;
-		for(int i = 0; i < this.gameList.size(); i++){
-			for(int j = 0; j < this.gameList.get(i).size(); j++){
-				if(this.gameList.get(i).get(j) == num){
+		for(int i = 0; i < this.gameBoard.getGameList().size(); i++){
+			for(int j = 0; j < this.gameBoard.getGameList().get(i).size(); j++){
+				if(this.gameBoard.getGameList().get(i).get(j) == num){
 					posR = i;
 					posC = j; 		
 				}
@@ -360,34 +412,36 @@ public class GameWindow {
 		}
 		
 		// Try to access empty space near found number
+		// If we get an exception, outside array, ignore. 
 		try {
-			if(this.gameList.get(posR).get(posC + 1) == -1) {
+			if(this.gameBoard.getGameList().get(posR).get(posC + 1) == -1) {
 				swapEmptySpace(posR, posC);
 				return true; 
 			}
 		} catch(Exception e){
 		}
 		try {
-			if(this.gameList.get(posR).get(posC - 1) == -1) {
+			if(this.gameBoard.getGameList().get(posR).get(posC - 1) == -1) {
 				swapEmptySpace(posR, posC);
 				return true; 
 			}
 		} catch(Exception e){
 		}
 		try {
-			if(this.gameList.get(posR + 1).get(posC) == -1) {
+			if(this.gameBoard.getGameList().get(posR + 1).get(posC) == -1) {
 				swapEmptySpace(posR, posC);
 				return true;
 			}
 		} catch(Exception e){
 		}
 		try {
-			if(this.gameList.get(posR - 1).get(posC) == -1) {
+			if(this.gameBoard.getGameList().get(posR - 1).get(posC) == -1) {
 				swapEmptySpace(posR, posC);
 				return true;
 			}
 		} catch(Exception e){
 		}
+
 		
 		// Was unable to swap, bad move
 		return false;
@@ -400,26 +454,36 @@ public class GameWindow {
 	 */
 	private void swapEmptySpace(int posR, int posC) {
 		// Find -1 which indicates the empty space 
-		int emptyR = -1, emptyC = -1;
-		for(int i = 0; i < this.gameList.size(); i++){
-			for(int j = 0; j < this.gameList.get(i).size(); j++){
-				if(this.gameList.get(i).get(j) == -1){
-					emptyR = i;
-					emptyC = j; 		
-				}
-			}
-		}
+//		int emptyR = -1, emptyC = -1;
+//		for(int i = 0; i < this.gameBoard.getGameList().size(); i++){
+//			for(int j = 0; j < this.gameBoard.getGameList().get(i).size(); j++){
+//				if(this.gameBoard.getGameList().get(i).get(j) == -1){
+//					emptyR = i;
+//					emptyC = j; 		
+//				}
+//			}
+//		}
 		
-		// Sanity check, should have found empty space
-		if(emptyR == -1 || emptyC == -1){
-			throw new Error("Did not find the empty space!");
-		}
+		
+		
+//		// Sanity check, should have found empty space
+//		if(emptyR == -1 || emptyC == -1){
+//			throw new Error("Did not find the empty space!");
+//		}
+		
+		
+		int emptyR = gameBoard.getEmptyRow();  
+		int emptyC = gameBoard.getEmptyCol();
 		
 		// Swap empty space with new number 
-		this.gameList.get(emptyR).set(emptyC, this.gameList.get(posR).get(posC)); 
+		this.gameBoard.getGameList().get(emptyR).set(emptyC, this.gameBoard.getGameList().get(posR).get(posC)); 
 		
 		// Swap new number with empty space 
-		this.gameList.get(posR).set(posC, -1); 
+		this.gameBoard.getGameList().get(posR).set(posC, -1); 
+		
+		// Update gameboard with new empty space number
+		gameBoard.setEmptyRow(posR);
+		gameBoard.setEmptyCol(posC); 
 	}
 	
 	/**
@@ -431,21 +495,21 @@ public class GameWindow {
 		this.gridPanel.removeAll(); 
 		
 		// Array of buttons to form the grid
-		JButton[][] grid = new JButton[gameList.size()][gameList.size()]; 
+		JButton[][] grid = new JButton[gameBoard.getGameList().size()][gameBoard.getGameList().size()]; 
 		
 		
-		for(int i = 0; i < gameList.size(); i++) {			
+		for(int i = 0; i < gameBoard.getGameList().size(); i++) {			
 
-			for(int j = 0; j < gameList.get(i).size(); j++){				
+			for(int j = 0; j < gameBoard.getGameList().get(i).size(); j++){				
 				
 				// When the gamelist's num is -1 that is the blank space
-				if(gameList.get(i).get(j) == -1){
+				if(gameBoard.getGameList().get(i).get(j) == -1){
 					grid[i][j] = new JButton(" "); 
 					this.gridPanel.add(grid[i][j]); 
 					continue; 
 				}
 				
-				JButton numButton = new JButton(String.valueOf(gameList.get(i).get(j))); 
+				JButton numButton = new JButton(String.valueOf(gameBoard.getGameList().get(i).get(j))); 
 				
 				// Add an action listener to each button
 				// On click try to move the number into the open space
@@ -503,10 +567,10 @@ public class GameWindow {
 		
 		// Loop through making sure each number is only 1 more than the previous
 		// skip the empty space.
-		for(int i = 0; i < gameList.size(); i++) {			
-            int count = 0;
-			for(int j = 0; j < gameList.get(i).size(); j++){				
-				int num = gameList.get(i).get(j);
+        int count = 0;
+		for(int i = 0; i < gameBoard.getGameList().size(); i++) {			
+			for(int j = 0; j < gameBoard.getGameList().get(i).size(); j++){				
+				int num = gameBoard.getGameList().get(i).get(j);
 				// When the gamelist's num is -1 that is the blank space
 				if(num == -1){
 					continue; 
@@ -533,4 +597,19 @@ public class GameWindow {
 		return true;
 	}
 
+	/** 
+	 * Look through the ai buttons and 
+	 * return the selected ai type enum
+	 */
+	private AiType getSelectedAi() {
+		
+		if (aiDfs.isSelected()) return AiType.DFS;
+		if (aiBfs.isSelected()) return AiType.BFS; 	
+		//if (aiDfs.isSelected()) return AiType.ASTAR;
+		
+		// If it is not the others it must be this one
+		return AiType.ASTAR;
+		
+	}
+	
 }
