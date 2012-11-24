@@ -36,6 +36,44 @@ public class GameBoard {
 		this.getGameList().clear(); 
 	}
 	
+	/**
+	 * Check the existing gameList array to see if the numbers 
+	 * are arranged to produce a win
+	 */
+	public boolean checkForWin() {
+		
+		// Loop through making sure each number is only 1 more than the previous
+		// skip the empty space.
+        int count = 0;
+		for(int i = 0; i < gameList.size(); i++) {			
+			for(int j = 0; j < gameList.get(i).size(); j++){				
+				int num = gameList.get(i).get(j);
+				// When the gamelist's num is -1 that is the blank space
+				if(num == -1){
+					continue; 
+				}
+				
+				// If count is 0 first iteration just plug in first number
+				if(count == 0){
+					count = num;
+				} else {
+					// The next number should be larger than count by 1.
+					// If not the game is not won.
+					if(count + 1 != num) {
+						return false; 
+					} else {
+						// The last checked number becomes the new count
+						count = num; 
+					}
+				}
+					
+			}
+		}
+		
+		// Check completed successfully
+		return true;
+	}
+	
 	public int getEmptyRow() {
 		return emptyRow;
 	}

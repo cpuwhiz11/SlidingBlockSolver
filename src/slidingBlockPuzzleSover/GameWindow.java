@@ -152,10 +152,12 @@ public class GameWindow {
             public void actionPerformed(ActionEvent e)
             {
             	// Execute solver AI
-            	//throw new Error("HAVE NOT DONE THIS YET"); 
             	
             	// Get the selected AI type
-            	runAiDispath(getSelectedAi(), gameBoard);
+            	ArrayList<Integer> moveList = AiSolvers.runAiDispath(getSelectedAi(), gameBoard);
+            	
+            	// Show the winning moves being made
+            	makeMoves(moveList);
             }
 
         });   
@@ -289,7 +291,13 @@ public class GameWindow {
 		            public void actionPerformed(ActionEvent e)
 		            {
 		            	
-		            	// Execute solver AI
+		            	// Do not allow a user to make a move if they 
+		            	// ai run option is selected
+		            	if(btnRunAi.isEnabled()){
+		            		return; 
+		            	}
+		            	
+		            	// See if move is valid
 		            	Boolean result = 
 		            			moveNumber(Integer.parseInt(((JButton)e.getSource()).getText())); 
 		            	
@@ -306,7 +314,7 @@ public class GameWindow {
 		            	refreshGridView(); 
 		            	
 		            	// Check for a win after each move
-		            	result = checkForWin();
+		            	result = gameBoard.checkForWin();
 		            	
 		            	// Game is won
 		            	if(result){
@@ -452,25 +460,7 @@ public class GameWindow {
 	 * @param posR, row value to be swapped is in
 	 * @param posC, column value to be swapped is in 
 	 */
-	private void swapEmptySpace(int posR, int posC) {
-		// Find -1 which indicates the empty space 
-//		int emptyR = -1, emptyC = -1;
-//		for(int i = 0; i < this.gameBoard.getGameList().size(); i++){
-//			for(int j = 0; j < this.gameBoard.getGameList().get(i).size(); j++){
-//				if(this.gameBoard.getGameList().get(i).get(j) == -1){
-//					emptyR = i;
-//					emptyC = j; 		
-//				}
-//			}
-//		}
-		
-		
-		
-//		// Sanity check, should have found empty space
-//		if(emptyR == -1 || emptyC == -1){
-//			throw new Error("Did not find the empty space!");
-//		}
-		
+	private void swapEmptySpace(int posR, int posC) {		
 		
 		int emptyR = gameBoard.getEmptyRow();  
 		int emptyC = gameBoard.getEmptyCol();
@@ -517,7 +507,13 @@ public class GameWindow {
 					 
 		            public void actionPerformed(ActionEvent e)
 		            {
-		            	// Execute solver AI
+		            	// Do not allow a user to make a move if they 
+		            	// ai run option is selected
+		            	if(btnRunAi.isEnabled()){
+		            		return; 
+		            	}
+		            	
+		            	// Check if move is valid
 		            	Boolean result = 
 		            			moveNumber(Integer.parseInt(((JButton)e.getSource()).getText())); 
 		            	
@@ -534,7 +530,7 @@ public class GameWindow {
 		            	refreshGridView(); 
 		            	
 		            	// Check for a win after each move
-		            	result = checkForWin();
+		            	result = gameBoard.checkForWin();
 		            	
 		            	// Game is won
 		            	if(result){
@@ -559,50 +555,13 @@ public class GameWindow {
 		refreshView(); 
 		
 	}
-	/**
-	 * Check the existing gameList array to see if the numbers 
-	 * are arranged to produce a win
-	 */
-	private boolean checkForWin() {
-		
-		// Loop through making sure each number is only 1 more than the previous
-		// skip the empty space.
-        int count = 0;
-		for(int i = 0; i < gameBoard.getGameList().size(); i++) {			
-			for(int j = 0; j < gameBoard.getGameList().get(i).size(); j++){				
-				int num = gameBoard.getGameList().get(i).get(j);
-				// When the gamelist's num is -1 that is the blank space
-				if(num == -1){
-					continue; 
-				}
-				
-				// If count is 0 first iteration just plug in first number
-				if(count == 0){
-					count = num;
-				} else {
-					// The next number should be larger than count by 1.
-					// If not the game is not won.
-					if(count + 1 != num) {
-						return false; 
-					} else {
-						// The last checked number becomes the new count
-						count = num; 
-					}
-				}
-					
-			}
-		}
-		
-		// Check completed successfully
-		return true;
-	}
 
 	/** 
 	 * Look through the ai buttons and 
 	 * return the selected ai type enum
 	 */
 	private AiType getSelectedAi() {
-		
+	
 		if (aiDfs.isSelected()) return AiType.DFS;
 		if (aiBfs.isSelected()) return AiType.BFS; 	
 		//if (aiDfs.isSelected()) return AiType.ASTAR;
@@ -612,4 +571,24 @@ public class GameWindow {
 		
 	}
 	
+	/**
+	 * Given a list of numbers to move make each swap
+	 * well waiting a period of time before making the next one
+	 * @param moveList, a list of moves to make in order
+	 */
+	private void makeMoves(ArrayList<Integer> moveList){
+		for (int move : moveList ){
+			AiUtils.makeMove(move, gameBoard);
+			refreshGridView();
+			
+			try {
+				// Sleep for half a second between moves
+				Thread.sleep(500);
+			} catch (InterruptedException e) {
+				e.printStackTrace();
+			}
+		}
+		
+		// All done print some game stats
+	}
 }
