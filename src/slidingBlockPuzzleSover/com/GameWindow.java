@@ -474,6 +474,9 @@ public class GameWindow {
 		// Update gameboard with new empty space number
 		gameBoard.setEmptyRow(posR);
 		gameBoard.setEmptyCol(posC); 
+		
+		// Increment swaps
+		gameBoard.incrementSwaps(); 
 	}
 	
 	/**

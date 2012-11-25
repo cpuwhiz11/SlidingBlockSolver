@@ -11,7 +11,7 @@ import java.util.ArrayList;
  * @author paul
  *
  */
-public class GameBoard {
+public class GameBoard implements Cloneable, Comparable<GameBoard>{
 	/** Holds the game board's distribution of numbers */
 	private ArrayList<ArrayList<Integer>> gameList;
 	
@@ -22,6 +22,9 @@ public class GameBoard {
 	
 	/** Track the number of swaps a player makes */
 	private int swaps = 0;
+	
+	/** Track the moves made to get the winning board */
+	private ArrayList<Integer> moveList = new ArrayList<Integer>();  
 	
 	/**
 	 * Reset game board values to default
@@ -82,10 +85,6 @@ public class GameBoard {
 
 	public void setEmptyRow(int emptyRow) {
 		this.emptyRow = emptyRow;
-		
-		// Every time this number changes a swap occurs
-		// update the swap value.
-		this.swaps++; 
 	}
 
 	public int getEmptyCol() {
@@ -114,6 +113,51 @@ public class GameBoard {
 
 	public void setSwaps(int swaps) {
 		this.swaps = swaps;
+	}
+	
+	protected GameBoard clone() throws CloneNotSupportedException {
+        GameBoard newObj = (GameBoard) super.clone();
+        
+        // Copy numbers into newGameList
+        ArrayList<ArrayList<Integer>> newGameList = new ArrayList<ArrayList<Integer>>(gameList.size()); 
+
+        for(int i = 0; i < gameList.size(); i++){
+
+        	// For each row add the column of numbers to the list
+        	ArrayList<Integer> copyRow = new ArrayList<Integer>(); 
+        	for(int item : gameList.get(i)){			
+        		copyRow.add(item);				
+        	}
+
+        	newGameList.add(copyRow); 
+        }
+
+        
+        newObj.setGameList(newGameList);
+        return newObj; 
+        
+    }
+
+	@Override
+	public int compareTo(GameBoard compareBoard) {
+		if (this.swaps > compareBoard.swaps) return 1; 
+		return 0;
+	}
+
+	public ArrayList<Integer> getMoveList() {
+		return moveList;
+	}
+
+	public void setMoveList(ArrayList<Integer> moveList) {
+		this.moveList = moveList;
+	}
+
+	public void addToMoveList(int move) {
+		this.moveList.add(move); 	
+	}
+	
+	public void incrementSwaps(){
+		this.swaps++; 
 	}
 
 }

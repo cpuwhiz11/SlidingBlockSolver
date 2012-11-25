@@ -60,22 +60,44 @@ public class AiSolvers {
 		
 		while (!gameQueue.isEmpty()){
 			// Get first gameboard
-			GameBoard inspectBoard = gameQueue.poll();
+//			GameBoard inspectBoard = null;
+//			try {
+//				inspectBoard = (GameBoard) gameQueue.poll().clone();
+//			} catch (CloneNotSupportedException e) {
+//				e.printStackTrace();
+//				throw new Error("Did not clone board correctly on queue pop"); 
+//			}
 			
+			GameBoard inspectBoard = (GameBoard) gameQueue.poll();
 			if (inspectBoard.checkForWin()){
+				// Set winMoves to be the address of the movelist
+				// that contains the winning moves from the gameboard
+				winMoves = inspectBoard.getMoveList(); 
 				break;
 			}
 			
-			// Get all the possible moves 
+			 // Get all the possible moves 
 			 List<Integer> posMoveList = new ArrayList<Integer>(); 
 			 posMoveList = AiUtils.getAllPossibleMoves(inspectBoard);
 			 
 			 // Make each move and add unique gameboard to queue
 			 for(int move : posMoveList){
-				 AiUtils.makeMove(move, inspectBoard);
+				 // Each new move creates a new game board which is added to the queue
+				 GameBoard newBoard = null;
+				 try {
+					newBoard = inspectBoard.clone();
+				} catch (CloneNotSupportedException e) {
+					e.printStackTrace();
+					throw new Error("Did not clone board correctly on move loop"); 
+				}
 				 
-				 // FIXME this is not quite right yet 
-				 gameQueue.add(inspectBoard);
+				 AiUtils.makeMove(move, newBoard);
+				 
+				 // Each new gameboard gets the move added to the solution array
+				 newBoard.addToMoveList(move); 
+				 
+				 // Add new board to queue 
+				 gameQueue.add(newBoard);
 			 }
 			 
 		}

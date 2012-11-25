@@ -58,7 +58,7 @@ public class AiUtils {
 		int swapR = -1, swapC = -1;
 		for(int i = 0; i < gameBoard.getGameList().size(); i++){
 			for(int j = 0; j < gameBoard.getGameList().get(i).size(); j++){
-				if(gameBoard.getGameList().get(i).get(j) == -1){
+				if(gameBoard.getGameList().get(i).get(j) == numToMove){
 					swapR = i;
 					swapC = j; 		
 				}
@@ -67,7 +67,7 @@ public class AiUtils {
 		
 		// Sanity check, should have found empty space
 		if(swapR == -1 || swapC == -1){
-			throw new Error("Did not find the number to swap!");
+			throw new Error("Did not find the number: " + String.valueOf(numToMove) + " to swap on the list:" + gameBoard.getGameList().toString());
 		}
 		
 		// Swap empty space with new number 
@@ -75,6 +75,14 @@ public class AiUtils {
 		
 		// Swap new number with empty space 
 		gameBoard.getGameList().get(swapR).set(swapC, -1); 
+		
+		// Increment swap count
+		gameBoard.incrementSwaps(); 
+		
+		// Set location of new empty space
+		// this was the location of the number we swapped
+		gameBoard.setEmptyCol(swapC);
+		gameBoard.setEmptyRow(swapR); 
 	}
 
 }
