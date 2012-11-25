@@ -1,4 +1,4 @@
-package slidingBlockPuzzleSover;
+package slidingBlockPuzzleSover.com;
 
 public class SlidingBlockPuzzleSover {
 

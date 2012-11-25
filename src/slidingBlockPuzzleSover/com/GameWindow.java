@@ -1,4 +1,4 @@
-package slidingBlockPuzzleSover;
+package slidingBlockPuzzleSover.com;
 
 import java.awt.FlowLayout;
 import java.awt.GridLayout;
