@@ -52,6 +52,9 @@ public class AiSolvers {
 		// List of winning moves
 		ArrayList<Integer> winMoves = new ArrayList<Integer>(); 
 		
+		// Counter of how many boards inspected
+		int numInspected = 0;
+		
 		// Create a queue to hold all the gameboards
 		AbstractQueue<GameBoard> gameQueue = new PriorityQueue<GameBoard>(); 
 		
@@ -122,11 +125,14 @@ public class AiSolvers {
 				 
 				 // Add new board to queue 
 				 gameQueue.add(newBoard);
+				 
+				 numInspected++;
 			 }
 			 
 		}
 		
-		
+		// Add the number of inspected game boards to the end of the list
+		winMoves.add(numInspected);
 		return winMoves; 
 		
 	}

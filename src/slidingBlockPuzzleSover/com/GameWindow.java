@@ -16,6 +16,7 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JRadioButton;
 import javax.swing.JTextField;
+import javax.swing.Timer;
 import javax.swing.border.EmptyBorder;
 
 /**
@@ -585,21 +586,31 @@ public class GameWindow {
 	 * @param moveList, a list of moves to make in order
 	 */
 	private void makeMoves(ArrayList<Integer> moveList){
-		for (int move : moveList ){
+	
+		ActionListener taskPerformer = new ActionListener() {
+			public void actionPerformed(ActionEvent evt) {
+				refreshGridView();
+			}
+		};
+		
+
+//		Timer guiTimer = new Timer(500, taskPerformer);
+//		guiTimer.setRepeats(false); 
+//		guiTimer.setInitialDelay(500); 
+		int numInspected = moveList.remove(moveList.size() - 1);
+		System.out.print("Number of inspected game boards: " + String.valueOf(numInspected) + "\n");
+		
+		for (int move : moveList){
 			AiUtils.makeMove(move, gameBoard);
-			refreshGridView();
 			
 			// Print the move we just did
 			System.out.print("Moved the: " + String.valueOf(move) + "\n");
 			
-			try {
-				// Sleep for half a second between moves
-				Thread.sleep(500);
-			} catch (InterruptedException e) {
-				e.printStackTrace();
-			}
+//			guiTimer.start();
 			
+		    	
 		}
+		refreshGridView();
 		
 		// All done print some game stats
 	}
