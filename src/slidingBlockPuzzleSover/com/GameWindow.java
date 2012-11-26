@@ -100,9 +100,14 @@ public class GameWindow {
 			 
             public void actionPerformed(ActionEvent e)
             {
-            	// Change grid size
-            	setGridSize(Integer.parseInt(gridSizeField.getText())); 
-            	refreshView(); 
+            	// Only change grid size if the user provided something
+            	if(!gridSizeField.getText().trim().isEmpty()){
+            		// Change grid size
+            		setGridSize(Integer.parseInt(gridSizeField.getText())); 
+            		refreshView(); 
+            	} else {
+            		System.out.print("\nYou must provide a size!\n");
+            	}
             }
 
         });  
@@ -344,7 +349,7 @@ public class GameWindow {
 			this.gameBoard.getGameList().add(copyRow); 
 		}
 		
-		System.out.print("New grid is: " + this.gameBoard.getGameList().toString()); 
+		System.out.print("New grid is: " + this.gameBoard.getGameList().toString() + "\n"); 
     	//List<Integer> posMoves = AiUtils.getNextMove(this.gameList);
 		
 	}
@@ -584,12 +589,16 @@ public class GameWindow {
 			AiUtils.makeMove(move, gameBoard);
 			refreshGridView();
 			
+			// Print the move we just did
+			System.out.print("Moved the: " + String.valueOf(move) + "\n");
+			
 			try {
 				// Sleep for half a second between moves
 				Thread.sleep(500);
 			} catch (InterruptedException e) {
 				e.printStackTrace();
 			}
+			
 		}
 		
 		// All done print some game stats

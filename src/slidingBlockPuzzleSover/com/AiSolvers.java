@@ -68,7 +68,7 @@ public class AiSolvers {
 //				throw new Error("Did not clone board correctly on queue pop"); 
 //			}
 			
-			GameBoard inspectBoard = (GameBoard) gameQueue.poll();
+			GameBoard inspectBoard = gameQueue.poll();
 			if (inspectBoard.checkForWin()){
 				// Set winMoves to be the address of the movelist
 				// that contains the winning moves from the gameboard
@@ -83,13 +83,37 @@ public class AiSolvers {
 			 // Make each move and add unique gameboard to queue
 			 for(int move : posMoveList){
 				 // Each new move creates a new game board which is added to the queue
-				 GameBoard newBoard = null;
-				 try {
-					newBoard = inspectBoard.clone();
-				} catch (CloneNotSupportedException e) {
-					e.printStackTrace();
-					throw new Error("Did not clone board correctly on move loop"); 
-				}
+//				 GameBoard newBoard = null;
+//				 try {
+//					newBoard = inspectBoard.clone();
+//				} catch (CloneNotSupportedException e) {
+//					e.printStackTrace();
+//					throw new Error("Did not clone board correctly on move loop"); 
+//				}
+				 
+				 // Create a new gameBoard from the insepectBoard obj
+				 // pedantically copy the objects since java IS PASS BY REFERENCE
+				 GameBoard newBoard = new GameBoard(new ArrayList<ArrayList<Integer>>());				 			 
+				 ArrayList<ArrayList<Integer>> newList = new ArrayList<ArrayList<Integer>>();
+				 // Copy numbers overs to newBoard
+				 for(int i = 0; i < inspectBoard.getGameList().size(); i++){
+
+					 // For each row add the column of numbers to the list
+					 ArrayList<Integer> copyRow = new ArrayList<Integer>(); 
+					 for(int item : inspectBoard.getGameList().get(i)){			
+						 copyRow.add(item);				
+					 }
+
+					 newList.add(copyRow); 
+				 }
+				 
+				 // Copy over past moves				 
+				 newBoard.setMoveList(new ArrayList<Integer>(inspectBoard.getMoveList()));
+				 
+				 newBoard.setGameList(newList); 
+				 newBoard.setEmptyCol(inspectBoard.getEmptyCol());
+				 newBoard.setEmptyRow(inspectBoard.getEmptyRow());
+				 newBoard.setSwaps(inspectBoard.getSwaps()); 
 				 
 				 AiUtils.makeMove(move, newBoard);
 				 

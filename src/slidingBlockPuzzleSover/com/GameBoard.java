@@ -4,6 +4,7 @@ package slidingBlockPuzzleSover.com;
 import java.util.ArrayList;
 
 
+
 /**
  * Class to hold a gameBoard objects. 
  * Tracks the empty space, the location of numbers, and the number
@@ -118,22 +119,28 @@ public class GameBoard implements Cloneable, Comparable<GameBoard>{
 	protected GameBoard clone() throws CloneNotSupportedException {
         GameBoard newObj = (GameBoard) super.clone();
         
-        // Copy numbers into newGameList
-        ArrayList<ArrayList<Integer>> newGameList = new ArrayList<ArrayList<Integer>>(gameList.size()); 
-
-        for(int i = 0; i < gameList.size(); i++){
-
-        	// For each row add the column of numbers to the list
-        	ArrayList<Integer> copyRow = new ArrayList<Integer>(); 
-        	for(int item : gameList.get(i)){			
-        		copyRow.add(item);				
-        	}
-
-        	newGameList.add(copyRow); 
-        }
-
+//        // Copy numbers into newGameList
+//        ArrayList<ArrayList<Integer>> newGameList = new ArrayList<ArrayList<Integer>>(gameList.size()); 
+//
+//        for(int i = 0; i < gameList.size(); i++){
+//
+//        	// For each row add the column of numbers to the list
+//        	ArrayList<Integer> copyRow = new ArrayList<Integer>(); 
+//        	for(int item : gameList.get(i)){			
+//        		copyRow.add(item);				
+//        	}
+//
+//        	newGameList.add(copyRow); 
+//        }
+//
+//        
+//        newObj.setGameList(newGameList);
+//        
+//        newObj.setEmptyCol(this.emptyCol);
+//        newObj.setEmptyRow(this.emptyRow);
+//        newObj.setSwaps(this.swaps); 
+//        
         
-        newObj.setGameList(newGameList);
         return newObj; 
         
     }
