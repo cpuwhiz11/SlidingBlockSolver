@@ -23,23 +23,56 @@ public class AiUtils {
 		// If we get an exception, outside array, ignore. 
 		int emptyR = gameBoard.getEmptyRow();
 		int emptyC = gameBoard.getEmptyCol();
+		int sizeR = gameBoard.getGameList().size();
 		
-		try {
-			posMoves.add(gameBoard.getGameList().get(emptyR).get(emptyC + 1));
-		} catch(Exception e){
+		// All the columns will be the same size
+		int sizeC = gameBoard.getGameList().get(0).size();
+		
+		// Temp number holding
+		int num = 0;
+		
+		// The number we last moved.
+		// Ignore moves that move the number we just moved
+		int moveListSize = gameBoard.getMoveList().size();
+		
+		int lastMove = 0;
+		if (moveListSize > 0) {
+			// The last move is the most recent move added to the list
+			lastMove = gameBoard.getMoveList().get(moveListSize - 1); 
+		}				
+		
+		// Only get valid moves
+		// more efficient than ignoring exceptions
+		if (emptyC + 1 < sizeC){
+			num = gameBoard.getGameList().get(emptyR).get(emptyC + 1);
+			
+			if (lastMove != num){
+				posMoves.add(num);
+			}			
 		}
-		try {
-			posMoves.add(gameBoard.getGameList().get(emptyR).get(emptyC - 1) );
-
-		} catch(Exception e){
+		
+		if (emptyC - 1 >= 0){
+			
+			num = gameBoard.getGameList().get(emptyR).get(emptyC - 1);
+			if (lastMove != num){
+				posMoves.add(num);
+			}	
 		}
-		try {
-			posMoves.add(gameBoard.getGameList().get(emptyR + 1).get(emptyC));
-		} catch(Exception e){
+		
+		if (emptyR + 1 < sizeR){
+			num = gameBoard.getGameList().get(emptyR + 1).get(emptyC);
+			
+			if (lastMove != num){
+				posMoves.add(num);
+			}	
 		}
-		try {
-			posMoves.add(gameBoard.getGameList().get(emptyR - 1).get(emptyC));
-		} catch(Exception e){
+		
+		if (emptyR - 1 >= 0){
+			num = gameBoard.getGameList().get(emptyR - 1).get(emptyC);
+			
+			if (lastMove != num){
+				posMoves.add(num);
+			}	
 		}
 
 		return posMoves; 
