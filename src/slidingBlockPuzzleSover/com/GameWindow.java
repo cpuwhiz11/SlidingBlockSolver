@@ -16,7 +16,6 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JRadioButton;
 import javax.swing.JTextField;
-import javax.swing.Timer;
 import javax.swing.border.EmptyBorder;
 
 /**
@@ -162,8 +161,13 @@ public class GameWindow {
             	// Get the selected AI type
             	ArrayList<Integer> moveList = AiSolvers.runAiDispath(getSelectedAi(), gameBoard);
             	
-            	// Show the winning moves being made
-            	makeMoves(moveList);
+            	if(moveList == null){
+            		// We did not find a solution
+            		System.out.print("Did not find a solution");
+            	} else {
+                	// Show the winning moves being made
+                	makeMoves(moveList);
+            	}          
             }
 
         });   
