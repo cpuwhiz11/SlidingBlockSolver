@@ -123,9 +123,31 @@ public class AiUtils {
 	 * The lower the score the better.
 	 * @param newBoard
 	 */
-	public static void getBoardScore(GameBoard newBoard) {
+	public static void getBoardScore(GameBoard newBoard, Heuristic type) {
 		//newBoard.setHeuristicScore(0);
 
+		// Possible heuristics
+		// 1. Number of pieces in wrong position
+		// 2. Sum of the distance all the pieces would have to move to be in the right place 
+		// 3. Manhattan distance of some pieces. 
+		
+		// Dispatch to proper Heuristic
+		switch (type) {
+		case OFFSETPOS:
+			AiUtils.offsetPositionHeuristic(newBoard);
+			break;
+			
+		case WRONGPLACECOUNT:
+			
+			break;
+
+		default:
+			throw new Error("Specified an incorrect heuristic enum: " + type.toString()); 
+		}
+		
+	}
+	
+	public static void offsetPositionHeuristic(GameBoard newBoard) {
 		// Calculate for each piece the total number of spaces it is out of place
 		// flatten the board
 		int[] flatBoard = new int[newBoard.getGameList().size() * newBoard.getGameList().size()]; 
@@ -147,6 +169,7 @@ public class AiUtils {
 		}
 		
 		newBoard.setHeuristicScore(count); 
+		
 	}
 
 }

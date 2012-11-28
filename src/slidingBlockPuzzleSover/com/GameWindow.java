@@ -164,14 +164,20 @@ public class GameWindow {
             	// Execute solver AI
             	
             	// Get the selected AI type
+            	// Time how long it takes (roughly)
+            	long start = System.nanoTime();    
             	ArrayList<Integer> moveList = AiSolvers.runAiDispath(getSelectedAi(), gameBoard, btnSaveSpace.isSelected());
+            	long elapsedTime = System.nanoTime() - start;          	
             	
             	if(moveList == null){
             		// We did not find a solution
             		System.out.print("Did not find a solution");
             	} else {
                 	// Show the winning moves being made
-                	makeMoves(moveList);
+            		// Last move on the list is the number of inspected boards
+            		int numInspected = moveList.remove(moveList.size() - 1);
+            		
+                	showEndGame(moveList, elapsedTime, numInspected);
             	}          
             }
 
@@ -609,11 +615,19 @@ public class GameWindow {
 	
 	/**
 	 * Given a list of numbers to move make each swap
-	 * well waiting a period of time before making the next one
+	 * well waiting a period of time before making the next one.
+	 * When finished showing the moves, print some endgame stats in a popup
+	 * 
 	 * @param moveList, a list of moves to make in order
+	 * @param elapsedTime, the amount of time in nanoseconds the ai took
+	 * @param inspectedBoards, the number of boards the ai looked at
 	 */
-	private void makeMoves(ArrayList<Integer> moveList){
+	private void showEndGame(ArrayList<Integer> moveList, double elapsedTime, int numInspected){
 	
+		// Convert nanoseconds to seconds 
+		double seconds = (double)elapsedTime / 1000000000.0;
+		
+		
 		ActionListener taskPerformer = new ActionListener() {
 			public void actionPerformed(ActionEvent evt) {
 				refreshGridView();
@@ -624,8 +638,9 @@ public class GameWindow {
 //		Timer guiTimer = new Timer(500, taskPerformer);
 //		guiTimer.setRepeats(false); 
 //		guiTimer.setInitialDelay(500); 
-		int numInspected = moveList.remove(moveList.size() - 1);
-		System.out.print("Number of inspected game boards: " + String.valueOf(numInspected) + "\n");
+
+		System.out.print("\nNumber of inspected game boards: " + String.valueOf(numInspected) + "\n");
+    	System.out.print("\nIt took roughly:" + String.valueOf(seconds) + "\n");
 		
 		for (int move : moveList){
 			AiUtils.makeMove(move, gameBoard);

@@ -43,11 +43,6 @@ public class AiSolvers {
 	 */
 	public static ArrayList<Integer> runAStar(GameBoard gameBoard) {
 		
-		// Possible heuristics
-		// 1. Number of pieces in wrong position
-		// 2. Sum of the distance all the pieces would have to move to be in the right place 
-		// 3. Manhattan distance of some pieces. 
-		
 		// List of winning moves
 		ArrayList<Integer> winMoves = null; 
 		
@@ -150,7 +145,7 @@ public class AiSolvers {
 				 
 				 //newBoard.addToMoveList(move); 
 				 // Calculate this boards heuristic score
-				 AiUtils.getBoardScore(newBoard); 
+				 AiUtils.getBoardScore(newBoard, Heuristic.OFFSETPOS); 
 
 				 // Add new board to queue 
 				 gameBoardList.add(newBoard);
