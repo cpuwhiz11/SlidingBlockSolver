@@ -118,4 +118,35 @@ public class AiUtils {
 		gameBoard.setEmptyRow(swapR); 
 	}
 
+	/**
+	 * Using a heuristic calculate a score for this board.
+	 * The lower the score the better.
+	 * @param newBoard
+	 */
+	public static void getBoardScore(GameBoard newBoard) {
+		//newBoard.setHeuristicScore(0);
+
+		// Calculate for each piece the total number of spaces it is out of place
+		// flatten the board
+		int[] flatBoard = new int[newBoard.getGameList().size() * newBoard.getGameList().size()]; 
+		int listIter = 0;
+		for(ArrayList<Integer> list : newBoard.getGameList()){
+			for(int i = 0; i < list.size(); i++){
+				flatBoard[i + list.size() * listIter] = list.get(i);
+			}
+			listIter++;
+		}
+		
+		int count = 0;
+		for(int i = 0; i < flatBoard.length; i++){
+			int num = flatBoard[i];
+			if(num != -1 && num != i + 1){
+				count = count + Math.abs(i - num);
+			}
+			
+		}
+		
+		newBoard.setHeuristicScore(count); 
+	}
+
 }

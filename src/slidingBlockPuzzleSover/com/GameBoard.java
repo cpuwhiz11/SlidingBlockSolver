@@ -27,6 +27,11 @@ public class GameBoard implements Cloneable, Comparable<GameBoard>{
 	/** Track the moves made to get the winning board */
 	private ArrayList<Integer> moveList = new ArrayList<Integer>();  
 	
+	/** Based on what heuristic we are using give this GameBoard a score */ 
+	private int heuristicScore = 0;
+	
+	private boolean looked = false; 
+	
 	/**
 	 * Reset game board values to default
 	 */
@@ -125,9 +130,11 @@ public class GameBoard implements Cloneable, Comparable<GameBoard>{
 
 	@Override
 	public int compareTo(GameBoard compareBoard) {
-		if (this.swaps > compareBoard.swaps) return 1; 
+		if (this.swaps > compareBoard.swaps) return 1;
+		//if(this.heuristicScore > compareBoard.heuristicScore) return 1; 
 		return 0;
 	}
+	
 
 	public ArrayList<Integer> getMoveList() {
 		return moveList;
@@ -143,6 +150,22 @@ public class GameBoard implements Cloneable, Comparable<GameBoard>{
 	
 	public void incrementSwaps(){
 		this.swaps++; 
+	}
+
+	public int getHeuristicScore() {
+		return heuristicScore;
+	}
+
+	public void setHeuristicScore(int heuristicScore) {
+		this.heuristicScore = heuristicScore;
+	}
+
+	public boolean isLooked() {
+		return looked;
+	}
+
+	public void setLooked(boolean looked) {
+		this.looked = looked;
 	}
 
 }

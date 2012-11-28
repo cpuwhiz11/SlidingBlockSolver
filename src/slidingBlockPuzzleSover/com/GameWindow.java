@@ -40,6 +40,8 @@ public class GameWindow {
 	private JRadioButton aiDfs;
 	private JRadioButton aiBfs;
 	private JRadioButton aiAStar;
+	private JRadioButton btnSaveTime;
+	private JRadioButton btnSaveSpace;
 	
 	public GameWindow() {
 		// Create main panel and frame
@@ -83,6 +85,9 @@ public class GameWindow {
 
 		JPanel homeEntry = new JPanel();
 		homeEntry.setLayout(new FlowLayout());
+		
+		JPanel lowerRow = new JPanel();
+		lowerRow.setLayout(new FlowLayout());
 		
 		// Label Describing box
 		JLabel entryLabel = new JLabel("Enter in grid size. Just enter in single number for NxN grid");
@@ -159,7 +164,7 @@ public class GameWindow {
             	// Execute solver AI
             	
             	// Get the selected AI type
-            	ArrayList<Integer> moveList = AiSolvers.runAiDispath(getSelectedAi(), gameBoard);
+            	ArrayList<Integer> moveList = AiSolvers.runAiDispath(getSelectedAi(), gameBoard, btnSaveSpace.isSelected());
             	
             	if(moveList == null){
             		// We did not find a solution
@@ -221,8 +226,26 @@ public class GameWindow {
 		// Always start on DFS
 		aiDfs.setSelected(true); 
 		
+		// Switch to use space saving option
+		ButtonGroup spaceCheckBoxGroup = new ButtonGroup();
+		
+		btnSaveTime = new JRadioButton("Better Time");
+		btnSaveSpace = new JRadioButton("Better Space");
+		
+		// Add to group
+		spaceCheckBoxGroup.add(btnSaveTime);
+		spaceCheckBoxGroup.add(btnSaveSpace);
+		
+		// Start on save time
+		btnSaveTime.setSelected(true); 
+		
+		// Add to panel
+		lowerRow.add(btnSaveTime);
+		lowerRow.add(btnSaveSpace);
+		
 		// Add the panel to the main panel
 		this.mainPanel.add(homeEntry); 
+		this.mainPanel.add(lowerRow);
 		
 	}
 	
