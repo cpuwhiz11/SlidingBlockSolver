@@ -138,7 +138,7 @@ public class AiUtils {
 			break;
 			
 		case WRONGPLACECOUNT:
-			
+			AiUtils.wrongPlaceCount(newBoard); 
 			break;
 
 		default:
@@ -146,11 +146,15 @@ public class AiUtils {
 		}
 		
 	}
-	
-	public static void offsetPositionHeuristic(GameBoard newBoard) {
-		// Calculate for each piece the total number of spaces it is out of place
-		// flatten the board
+
+	/**
+	 * Take a gameboard and flatten it into an int array
+	 * @param newBoard
+	 * @return reference to new flat int array
+	 */
+	private static int[] flattenBoard(GameBoard newBoard) {
 		int[] flatBoard = new int[newBoard.getGameList().size() * newBoard.getGameList().size()]; 
+		
 		int listIter = 0;
 		for(ArrayList<Integer> list : newBoard.getGameList()){
 			for(int i = 0; i < list.size(); i++){
@@ -159,6 +163,39 @@ public class AiUtils {
 			listIter++;
 		}
 		
+		return flatBoard; 
+	}
+	
+	/**
+	 * Calculate the number of pieces in the wrong place
+	 * @param newBoard
+	 */
+	public static void wrongPlaceCount(GameBoard newBoard) {
+		int[] flatBoard = flattenBoard(newBoard); 
+		
+		int count = 0;
+		for(int i = 0; i < flatBoard.length; i++){
+			int num = flatBoard[i];
+			if(num != -1 && num != i + 1){
+				count++; 
+			}
+			
+		}
+		
+		newBoard.setHeuristicScore(count); 
+		
+	}
+
+	/**
+	 * Calculate the total count of the displacement a piece is from 
+	 * its final position
+	 * @param newBoard
+	 */
+	public static void offsetPositionHeuristic(GameBoard newBoard) {
+		// Calculate for each piece the total number of spaces it is out of place
+		// flatten the board
+		int[] flatBoard = flattenBoard(newBoard); 
+	
 		int count = 0;
 		for(int i = 0; i < flatBoard.length; i++){
 			int num = flatBoard[i];

@@ -30,7 +30,11 @@ public class GameBoard implements Cloneable, Comparable<GameBoard>{
 	/** Based on what heuristic we are using give this GameBoard a score */ 
 	private int heuristicScore = 0;
 	
+	/** Have we looked at this board */
 	private boolean looked = false; 
+	
+	/** The heuristic we are using if an A* search */
+	private Heuristic heuristicType; 
 	
 	/**
 	 * Reset game board values to default
@@ -120,13 +124,13 @@ public class GameBoard implements Cloneable, Comparable<GameBoard>{
 	public void setSwaps(int swaps) {
 		this.swaps = swaps;
 	}
-	
+
 	protected GameBoard clone() throws CloneNotSupportedException {
-        GameBoard newObj = (GameBoard) super.clone();        
-        
-        return newObj; 
-        
-    }
+		GameBoard newObj = (GameBoard) super.clone();        
+
+		return newObj; 
+
+	}
 
 	@Override
 	public int compareTo(GameBoard compareBoard) {
@@ -166,6 +170,14 @@ public class GameBoard implements Cloneable, Comparable<GameBoard>{
 
 	public void setLooked(boolean looked) {
 		this.looked = looked;
+	}
+
+	public Heuristic getHeuristicType() {
+		return heuristicType;
+	}
+
+	public void setHeuristicType(Heuristic heuristicType) {
+		this.heuristicType = heuristicType;
 	}
 
 }

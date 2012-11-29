@@ -16,7 +16,10 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JRadioButton;
 import javax.swing.JTextField;
+import javax.swing.SwingUtilities;
+import javax.swing.Timer;
 import javax.swing.border.EmptyBorder;
+
 
 /**
  * This is the main game window class. It will display the game board and allow the user to execute 
@@ -31,17 +34,29 @@ public class GameWindow {
 	public JFrame mainFrame; 
 	public JPanel gridPanel; 
 	
+	/** The main gameboard from which all games are derived */
 	public GameBoard gameBoard = new GameBoard(new ArrayList<ArrayList<Integer>>());
 	
 	/** Buttons we listen to for actions */ 
 	private JButton btnRunAi;
-	private JButton btnChangeGrid;
-	private JTextField gridSizeField;
-	private JRadioButton aiDfs;
-	private JRadioButton aiBfs;
-	private JRadioButton aiAStar;
+	private JButton btnChangeGrid;	
+	
+	/** Ai buttons for types and options */
+	private JRadioButton btnAiDfs;
+	private JRadioButton btnAiBfs;
+	private JRadioButton btnAiAStar;
 	private JRadioButton btnSaveTime;
 	private JRadioButton btnSaveSpace;
+	private JRadioButton btnHeurOffset;
+	private JRadioButton btnHeurPlace; 
+	
+	/** End game labels */
+	private JLabel aiMoves = new JLabel();
+	private JLabel aiTime = new JLabel();
+	private JLabel boardsIns = new JLabel(); 
+	
+	/** Entry box for a user to put in the grid size he or she wants */
+	private JTextField gridSizeField;
 	
 	public GameWindow() {
 		// Create main panel and frame
@@ -52,7 +67,7 @@ public class GameWindow {
 		this.mainFrame.setLayout(new GridLayout(2, 1));
 		
 		// Set some style info
-		this.mainFrame.setSize(1000, 700);
+		this.mainFrame.setSize(900, 700);
 		//this.mainFrame.pack();
 		this.mainFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE); 
 		
@@ -83,9 +98,11 @@ public class GameWindow {
 	 */
 	private void setupPanel() {
 
+		// Main options
 		JPanel homeEntry = new JPanel();
 		homeEntry.setLayout(new FlowLayout());
 		
+		// AI options
 		JPanel lowerRow = new JPanel();
 		lowerRow.setLayout(new FlowLayout());
 		
@@ -162,6 +179,17 @@ public class GameWindow {
             public void actionPerformed(ActionEvent e)
             {
             	// Execute solver AI
+            	// If we are doing an a* search...
+            	if(btnAiAStar.isSelected()){
+            		// Set the gameboard with the heuristic we are using
+            		if(btnHeurOffset.isEnabled()){
+            			gameBoard.setHeuristicType(Heuristic.OFFSETPOS);
+            		}
+            		if(btnHeurPlace.isEnabled()){
+            			gameBoard.setHeuristicType(Heuristic.WRONGPLACECOUNT);
+            		}
+            		
+            	}
             	
             	// Get the selected AI type
             	// Time how long it takes (roughly)
@@ -191,11 +219,11 @@ public class GameWindow {
 		// Options to select particular ai
 		ButtonGroup aiCheckBoxGroup = new ButtonGroup();
 		
-		aiDfs = new JRadioButton("DFS");
-		aiBfs = new JRadioButton("BFS");
-		aiAStar = new JRadioButton("A*");
+		btnAiDfs = new JRadioButton("DFS");
+		btnAiBfs = new JRadioButton("BFS");
+		btnAiAStar = new JRadioButton("A*");
 		
-		aiDfs.addActionListener(new ActionListener() {
+		btnAiDfs.addActionListener(new ActionListener() {
 			 
             public void actionPerformed(ActionEvent e)
             {
@@ -203,7 +231,7 @@ public class GameWindow {
             }
         });   
 		
-		aiBfs.addActionListener(new ActionListener() {
+		btnAiBfs.addActionListener(new ActionListener() {
 			 
             public void actionPerformed(ActionEvent e)
             {
@@ -211,7 +239,7 @@ public class GameWindow {
             }
         });   
 		
-		aiAStar.addActionListener(new ActionListener() {
+		btnAiAStar.addActionListener(new ActionListener() {
 			 
             public void actionPerformed(ActionEvent e)
             {
@@ -220,17 +248,17 @@ public class GameWindow {
         });   
 		
 		// Add radio buttons to group
-		aiCheckBoxGroup.add(aiDfs);
-		aiCheckBoxGroup.add(aiBfs);
-		aiCheckBoxGroup.add(aiAStar);
+		aiCheckBoxGroup.add(btnAiDfs);
+		aiCheckBoxGroup.add(btnAiBfs);
+		aiCheckBoxGroup.add(btnAiAStar);
 		
 		// Add buttons to panel
-		homeEntry.add(aiDfs);
-		homeEntry.add(aiBfs);
-		homeEntry.add(aiAStar);
+		homeEntry.add(btnAiDfs);
+		homeEntry.add(btnAiBfs);
+		homeEntry.add(btnAiAStar);
 		
 		// Always start on DFS
-		aiDfs.setSelected(true); 
+		btnAiDfs.setSelected(true); 
 		
 		// Switch to use space saving option
 		ButtonGroup spaceCheckBoxGroup = new ButtonGroup();
@@ -249,10 +277,44 @@ public class GameWindow {
 		lowerRow.add(btnSaveTime);
 		lowerRow.add(btnSaveSpace);
 		
+		// Buttons for selecting heuristic type
+		ButtonGroup heuristicTypeGrp = new ButtonGroup();
+		
+		btnHeurOffset = new JRadioButton("Total Offset Position");
+		btnHeurPlace = new JRadioButton("Total Numbers Out of Place");
+		
+		heuristicTypeGrp.add(btnHeurOffset);
+		heuristicTypeGrp.add(btnHeurPlace);
+		
+		// Start with offset
+		btnHeurOffset.setSelected(true);
+		
+		// Add to panel
+		lowerRow.add(btnHeurOffset);
+		lowerRow.add(btnHeurPlace); 
+		
 		// Add the panel to the main panel
 		this.mainPanel.add(homeEntry); 
 		this.mainPanel.add(lowerRow);
 		
+		// These Labels will show end game info
+		JPanel bottomRow = new JPanel();
+		bottomRow.setLayout(new FlowLayout());		
+		bottomRow.add(aiMoves);
+		
+		JPanel bottomRow2 = new JPanel();
+		bottomRow2.setLayout(new FlowLayout());	
+		
+		JPanel bottomRow3 = new JPanel();
+		bottomRow3.setLayout(new FlowLayout());	
+		
+		//this.mainPanel.add(aiMoves);
+		bottomRow2.add(aiTime);
+		bottomRow3.add(boardsIns); 
+		
+		this.mainPanel.add(bottomRow);
+		this.mainPanel.add(bottomRow2);
+		this.mainPanel.add(bottomRow3);
 	}
 	
 	/**
@@ -604,8 +666,8 @@ public class GameWindow {
 	 */
 	private AiType getSelectedAi() {
 	
-		if (aiDfs.isSelected()) return AiType.DFS;
-		if (aiBfs.isSelected()) return AiType.BFS; 	
+		if (btnAiDfs.isSelected()) return AiType.DFS;
+		if (btnAiBfs.isSelected()) return AiType.BFS; 	
 		//if (aiDfs.isSelected()) return AiType.ASTAR;
 		
 		// If it is not the others it must be this one
@@ -623,37 +685,108 @@ public class GameWindow {
 	 * @param inspectedBoards, the number of boards the ai looked at
 	 */
 	private void showEndGame(ArrayList<Integer> moveList, double elapsedTime, int numInspected){
-	
+		
+    	for (int move : moveList){
+			//System.out.print("Moved the: " + String.valueOf(move) + "\n");
+			AiUtils.makeMove(move, gameBoard);
+			refreshGridView(); 
+    	}
+
+    	// Print out some stats in the GUI
+    	printEndGameStats(moveList, elapsedTime, numInspected);
+    	
+    	// FIXME GET THIS WORKING
+//    	ActionListener taskPerformer = new ActionListener() {
+//    		public void actionPerformed(ActionEvent evt) {
+//    			refreshGridView();
+//    		}
+//    	};
+//
+//
+//    	Timer guiTimer = new Timer(500, taskPerformer);
+//    	guiTimer.setRepeats(true);
+//    	guiTimer.setInitialDelay(500); 
+//    	
+//    	//boolean nextNum = false;
+//		for (int move : moveList){
+//			final int myMove = move;  
+//			SwingUtilities.invokeLater(new Runnable() {
+//				public void run() {
+//					System.out.print("Moved the: " + String.valueOf(myMove) + "\n");
+//					AiUtils.makeMove(myMove, gameBoard);
+//					refreshGridView();  
+//					
+//					try {
+//						//refreshGridView();
+//						Thread.sleep(500);
+//						//nextNum = true;
+//					} catch (InterruptedException e) {
+//						// TODO Auto-generated catch block
+//						e.printStackTrace();
+//					} 
+//				}
+//			});
+
+			//AiUtils.makeMove(move, gameBoard);
+			
+			// Print the move we just did
+			//System.out.print("Moved the: " + String.valueOf(move) + "\n");
+			
+//			Thread appThread = new Thread() {
+//				public void run() {
+//					try {
+//						SwingUtilities.invokeLater(doHelloWorld);
+//					}
+//					catch (Exception e) {
+//						e.printStackTrace();
+//					}
+//					//System.out.println("Finished on " + Thread.currentThread());
+//				}
+//			};
+//			appThread.start();
+//
+//			try {
+//				//refreshGridView();
+//				Thread.sleep(500);
+//				//nextNum = true;
+//			} catch (InterruptedException e) {
+//				// TODO Auto-generated catch block
+//				e.printStackTrace();
+//			} 
+			
+//			SwingUtilities.invokeLater(new Runnable() {
+//			    public void run() {
+//			    	System.out.print("Printing");
+//			    }
+//			});
+			
+//			refreshGridView();
+		    	
+
+		
+		// All done print some game stats
+	}
+
+	/**
+	 * Print some end game stats, updating the GUI
+	 * @param moveList, a list of moves to make in order
+	 * @param elapsedTime, the amount of time in nanoseconds the ai took
+	 * @param inspectedBoards, the number of boards the ai looked at
+	 */
+	public void printEndGameStats(ArrayList<Integer> moveList, double elapsedTime, int numInspected){
+		
 		// Convert nanoseconds to seconds 
 		double seconds = (double)elapsedTime / 1000000000.0;
-		
-		
-		ActionListener taskPerformer = new ActionListener() {
-			public void actionPerformed(ActionEvent evt) {
-				refreshGridView();
-			}
-		};
-		
-
-//		Timer guiTimer = new Timer(500, taskPerformer);
-//		guiTimer.setRepeats(false); 
-//		guiTimer.setInitialDelay(500); 
 
 		System.out.print("\nNumber of inspected game boards: " + String.valueOf(numInspected) + "\n");
     	System.out.print("\nIt took roughly:" + String.valueOf(seconds) + "\n");
 		
-		for (int move : moveList){
-			AiUtils.makeMove(move, gameBoard);
-			
-			// Print the move we just did
-			System.out.print("Moved the: " + String.valueOf(move) + "\n");
-			
-//			guiTimer.start();
-			
-		    	
-		}
-		refreshGridView();
+		aiMoves.setText("The moves to win: " + moveList.toString() + "\n");
+		aiTime.setText("\nIt took roughly:" + String.valueOf(seconds) + " Seconds\n");
+		boardsIns.setText("\nNumber of inspected game boards: " + String.valueOf(numInspected) + "\n");
 		
-		// All done print some game stats
+		refreshView();
 	}
+	
+
 }

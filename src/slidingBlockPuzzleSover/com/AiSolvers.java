@@ -128,6 +128,7 @@ public class AiSolvers {
 				 newBoard.setEmptyCol(inspectBoard.getEmptyCol());
 				 newBoard.setEmptyRow(inspectBoard.getEmptyRow());
 				 newBoard.setSwaps(inspectBoard.getSwaps()); 
+				 newBoard.setHeuristicType(inspectBoard.getHeuristicType());
 				 
 				 AiUtils.makeMove(move, newBoard);
 				 
@@ -145,7 +146,7 @@ public class AiSolvers {
 				 
 				 //newBoard.addToMoveList(move); 
 				 // Calculate this boards heuristic score
-				 AiUtils.getBoardScore(newBoard, Heuristic.OFFSETPOS); 
+				 AiUtils.getBoardScore(newBoard, newBoard.getHeuristicType()); 
 
 				 // Add new board to queue 
 				 gameBoardList.add(newBoard);
