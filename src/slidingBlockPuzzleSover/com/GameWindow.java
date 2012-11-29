@@ -51,7 +51,8 @@ public class GameWindow {
 	private JRadioButton btnHeurPlace; 
 	
 	/** End game labels */
-	private JLabel aiMoves = new JLabel();
+	private JLabel aiMovesList = new JLabel();
+	private JLabel numOfAiMoves = new JLabel();
 	private JLabel aiTime = new JLabel();
 	private JLabel boardsIns = new JLabel(); 
 	
@@ -300,7 +301,11 @@ public class GameWindow {
 		// These Labels will show end game info
 		JPanel bottomRow = new JPanel();
 		bottomRow.setLayout(new FlowLayout());		
-		bottomRow.add(aiMoves);
+		bottomRow.add(aiMovesList);
+		
+		JPanel bottomRow1 = new JPanel();
+		bottomRow1.setLayout(new FlowLayout());		
+		bottomRow1.add(numOfAiMoves);
 		
 		JPanel bottomRow2 = new JPanel();
 		bottomRow2.setLayout(new FlowLayout());	
@@ -313,6 +318,7 @@ public class GameWindow {
 		bottomRow3.add(boardsIns); 
 		
 		this.mainPanel.add(bottomRow);
+		this.mainPanel.add(bottomRow1);
 		this.mainPanel.add(bottomRow2);
 		this.mainPanel.add(bottomRow3);
 	}
@@ -781,7 +787,8 @@ public class GameWindow {
 		System.out.print("\nNumber of inspected game boards: " + String.valueOf(numInspected) + "\n");
     	System.out.print("\nIt took roughly:" + String.valueOf(seconds) + "\n");
 		
-		aiMoves.setText("The moves to win: " + moveList.toString() + "\n");
+		aiMovesList.setText("The moves to win: " + moveList.toString() + "\n");
+		numOfAiMoves.setText("That is : " + String.valueOf(moveList.size()) + "\n");
 		aiTime.setText("\nIt took roughly:" + String.valueOf(seconds) + " Seconds\n");
 		boardsIns.setText("\nNumber of inspected game boards: " + String.valueOf(numInspected) + "\n");
 		
