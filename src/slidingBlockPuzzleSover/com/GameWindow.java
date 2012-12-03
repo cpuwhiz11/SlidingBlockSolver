@@ -7,7 +7,6 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.ArrayList;
 import java.util.Collections;
-
 import javax.swing.ButtonGroup;
 import javax.swing.JButton;
 import javax.swing.JDialog;
@@ -16,8 +15,7 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JRadioButton;
 import javax.swing.JTextField;
-import javax.swing.SwingUtilities;
-import javax.swing.Timer;
+import javax.swing.SwingWorker;
 import javax.swing.border.EmptyBorder;
 
 
@@ -692,85 +690,44 @@ public class GameWindow {
 	 */
 	private void showEndGame(ArrayList<Integer> moveList, double elapsedTime, int numInspected){
 		
-    	for (int move : moveList){
-			//System.out.print("Moved the: " + String.valueOf(move) + "\n");
-			AiUtils.makeMove(move, gameBoard);
-			refreshGridView(); 
-    	}
+		// Create a swing worker executor to limit only one swingworker running at a time
+		SwingWorkerExecutor exec = SwingWorkerExecutor.getInstance();  
+		
+		// For each move create a swingworker
+		for (int move : moveList){
+			final int move2 = move;
+			
+			// Create a swingworker to make a move and then update the gui
+			class updateGui extends SwingWorker<Void, Object> {
+				@Override
+				public Void doInBackground() {
+					AiUtils.makeMove(move2, gameBoard);
+					try {
+						// Wait half a second 
+						Thread.sleep(500);
+					} catch (InterruptedException e) {
+						e.printStackTrace();
+					}
+					System.out.print("Moved the: " + String.valueOf(move2) + "\n");
+					return null;
+				}
 
+				@Override
+				protected void done() {
+					refreshGridView(); 
+				}
+			}
+			// Create this swingworker
+		    updateGui moveThread = new updateGui();		    
+		    
+		    // Execute the worker with the executor
+		    // limits executor to one worker at a time
+		    exec.execute(moveThread); 
+		}
+		
     	// Print out some stats in the GUI
     	printEndGameStats(moveList, elapsedTime, numInspected);
     	
-    	// FIXME GET THIS WORKING
-//    	ActionListener taskPerformer = new ActionListener() {
-//    		public void actionPerformed(ActionEvent evt) {
-//    			refreshGridView();
-//    		}
-//    	};
-//
-//
-//    	Timer guiTimer = new Timer(500, taskPerformer);
-//    	guiTimer.setRepeats(true);
-//    	guiTimer.setInitialDelay(500); 
-//    	
-//    	//boolean nextNum = false;
-//		for (int move : moveList){
-//			final int myMove = move;  
-//			SwingUtilities.invokeLater(new Runnable() {
-//				public void run() {
-//					System.out.print("Moved the: " + String.valueOf(myMove) + "\n");
-//					AiUtils.makeMove(myMove, gameBoard);
-//					refreshGridView();  
-//					
-//					try {
-//						//refreshGridView();
-//						Thread.sleep(500);
-//						//nextNum = true;
-//					} catch (InterruptedException e) {
-//						// TODO Auto-generated catch block
-//						e.printStackTrace();
-//					} 
-//				}
-//			});
-
-			//AiUtils.makeMove(move, gameBoard);
-			
-			// Print the move we just did
-			//System.out.print("Moved the: " + String.valueOf(move) + "\n");
-			
-//			Thread appThread = new Thread() {
-//				public void run() {
-//					try {
-//						SwingUtilities.invokeLater(doHelloWorld);
-//					}
-//					catch (Exception e) {
-//						e.printStackTrace();
-//					}
-//					//System.out.println("Finished on " + Thread.currentThread());
-//				}
-//			};
-//			appThread.start();
-//
-//			try {
-//				//refreshGridView();
-//				Thread.sleep(500);
-//				//nextNum = true;
-//			} catch (InterruptedException e) {
-//				// TODO Auto-generated catch block
-//				e.printStackTrace();
-//			} 
-			
-//			SwingUtilities.invokeLater(new Runnable() {
-//			    public void run() {
-//			    	System.out.print("Printing");
-//			    }
-//			});
-			
-//			refreshGridView();
-		    	
-
-		
-		// All done print some game stats
 	}
 
 	/**
@@ -788,7 +745,7 @@ public class GameWindow {
     	System.out.print("\nIt took roughly:" + String.valueOf(seconds) + "\n");
 		
 		aiMovesList.setText("The moves to win: " + moveList.toString() + "\n");
-		numOfAiMoves.setText("That is : " + String.valueOf(moveList.size()) + "\n");
+		numOfAiMoves.setText("That is : " + String.valueOf(moveList.size()) + " Moves\n");
 		aiTime.setText("\nIt took roughly:" + String.valueOf(seconds) + " Seconds\n");
 		boardsIns.setText("\nNumber of inspected game boards: " + String.valueOf(numInspected) + "\n");
 		
