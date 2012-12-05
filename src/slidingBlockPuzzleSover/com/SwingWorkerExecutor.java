@@ -10,7 +10,6 @@ import javax.swing.SwingWorker;
  * @author http://greatratrace.blogspot.com/2010/01/throttling-swingworker-using.html
  *
  */
-
 public class SwingWorkerExecutor {
 
 	private static final int MAX_WORKER_THREAD = 1;

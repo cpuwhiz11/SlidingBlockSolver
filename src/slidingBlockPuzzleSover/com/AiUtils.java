@@ -20,7 +20,6 @@ public class AiUtils {
 		List<Integer> posMoves = new ArrayList<Integer>();
 		
 		// Try to get numbers +1 in any direction from empty space
-		// If we get an exception, outside array, ignore. 
 		int emptyR = gameBoard.getEmptyRow();
 		int emptyC = gameBoard.getEmptyCol();
 		int sizeR = gameBoard.getGameList().size();
