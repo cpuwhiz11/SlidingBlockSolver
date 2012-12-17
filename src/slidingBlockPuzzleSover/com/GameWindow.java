@@ -377,7 +377,27 @@ public class GameWindow {
 		while(!isSolvable(intArray, n)) {
 			Collections.shuffle(intArray); 
 		}
-
+        
+//		if(n == 4){
+//			// Testing array 
+//			intArray = new ArrayList<Integer>();
+//			intArray.add(14); 
+//			intArray.add(4); 
+//			intArray.add(9); 
+//			intArray.add(7); 
+//			intArray.add(5); 
+//			intArray.add(10); 
+//			intArray.add(1); 
+//			intArray.add(12); 
+//			intArray.add(6); 
+//			intArray.add(13); 
+//			intArray.add(2); 
+//			intArray.add(3); 
+//			intArray.add(8); 
+//			intArray.add(11);
+//			intArray.add(15); 
+//		}
+		
 		// Counter to control when we dispense a number
 		int numCounter = 0; 
 
